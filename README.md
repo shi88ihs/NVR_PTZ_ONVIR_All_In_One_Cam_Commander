@@ -38,6 +38,12 @@ Install dependencies (see above)
 
 Edit your motion.conf as needed (use placeholders for RTSP URL if you wish)
 
+You can keep the script name long and descriptive—this makes it easy to understand its function and purpose at a glance. If you prefer, you can also shorten the filename or copy it to a directory like /opt for system-wide access.
+
+For convenience, you can create a simple fish shell alias like this:
+
+alias ccgui 'python3 ~/Downloads/NVR_PTZ_ONVIR_All_In_One_Cam_Commander_Tkinker_GUI.py' && funcsave ccgui
+
 Launch the script:
 
 python3 NVR_PTZ_ONVIR_All_In_One_Cam_Commander_Tkinker_GUI.py 192.168.1.xx
@@ -48,4 +54,4 @@ Enjoy your new open-source camera command center! 😎
 - Use `NVR_PTZ_ONVIR_All_In_One_Cam_Commander_Tkinker_GUI.py` as your main script filename.
 - Only the `.py` file and this `README.md` are needed for GitHub (plus optional `.gitignore`).
 
-**Let me know if you want to tweak the badge/headers or add example screenshots!**
+**Let me know if you want to tweak the badge/headers. Example screenshots will be added soon.**
