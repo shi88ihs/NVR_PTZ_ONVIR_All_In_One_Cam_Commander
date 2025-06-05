@@ -19,8 +19,8 @@ class PTZCameraControl:
         print(f"[DEBUG] Loaded config: {self.config}")
 
         self.root = tk.Tk()
-        self.root.title("PTZ Version 13")
-        self.root.geometry("360x460")
+        self.root.title("CamCommander - PTZ Ctrl + NVR Recording GUI")
+        self.root.geometry("360x540")  # Extra height for icon
 
         self.status_label = tk.Label(
             self.root, text="Disconnected", fg="red",
@@ -66,6 +66,7 @@ class PTZCameraControl:
             return ip, user, passwd
 
         root = tk.Tk()
+        root.title("Cam Commander GUI")
         root.withdraw()
         ip = None
         user = ""
@@ -79,7 +80,7 @@ class PTZCameraControl:
             root.quit()
 
         prompt = tk.Toplevel(root)
-        prompt.title("Select or Enter Camera Details")
+        prompt.title("Cam Commander GUI")
 
         tk.Label(prompt, text="Camera IP:").grid(row=0, column=0, sticky="e", padx=5, pady=5)
         combo_ip = ttk.Combobox(prompt, values=previous_ips)
@@ -192,6 +193,20 @@ class PTZCameraControl:
 
     def setup_ui(self):
         print("[DEBUG] Setting up UI...")
+
+        # Real icon above MotionEye link
+        import os
+
+# ...inside setup_ui()...
+        try:
+            icon_path = os.path.join(os.path.dirname(__file__), "MotionEye-Blue-64x64-Icon.png")
+            self.icon_img = tk.PhotoImage(file=icon_path)
+            icon_label = tk.Label(self.root, image=self.icon_img)
+            icon_label.pack(pady=(10, 0))
+        except Exception as e:
+            print(f"[DEBUG] Icon could not be loaded: {e}")
+
+
         control_frame = ttk.Frame(self.root)
         control_frame.pack(pady=18)
         btn_size = 24
@@ -202,35 +217,41 @@ class PTZCameraControl:
             ('↙', -1, -1), ('↓', 0, -1), ('↘', 1, -1)
         ]
         for i, (label, dx, dy) in enumerate(buttons):
-            btn = tk.Button(
-                control_frame,
-                text=label,
-                width=btn_size//10, height=btn_size//20,
-                font=btn_font,
-                bg="#ddd",
-                relief="raised",
-                bd=3,
-                command=(lambda x=dx, y=dy, l=label: self.move(x, y) if l != '■' else self.stop())
-            )
+            if label == '■':
+                btn = tk.Button(
+                    control_frame,
+                    text=label,
+                    width=btn_size//10, height=btn_size//20,
+                    font=btn_font,
+                    bg="#ddd",
+                    relief="raised",
+                    bd=3,
+                    command=self.go_to_center
+                )
+            else:
+                btn = tk.Button(
+                    control_frame,
+                    text=label,
+                    width=btn_size//10, height=btn_size//20,
+                    font=btn_font,
+                    bg="#ddd",
+                    relief="raised",
+                    bd=3,
+                    command=lambda x=dx, y=dy: self.move(x, y)
+                )
             btn.grid(row=i//3, column=i%3, padx=2, pady=2, sticky="nsew")
         for i in range(3):
             control_frame.grid_rowconfigure(i, weight=1, minsize=btn_size)
             control_frame.grid_columnconfigure(i, weight=1, minsize=btn_size)
 
-        # self.motion_btn = ttk.Button(self.root, text="Start Motion.py Movement Auto-Recording to File", command=self.start_motion)
-        # self.motion_btn.pack(pady=8)
-        # self.stop_motion_btn = ttk.Button(self.root, text="Stop Motion.py", command=self.stop_motion, state='disabled')
-        # self.stop_motion_btn.pack(pady=2)
-        self.motion_btn = ttk.Button(self.root, text="🟢 Start Auto Motion-Recording", command=self.start_motion)
+        self.motion_btn = ttk.Button(self.root, text="Start Motion Detection & Recording", command=self.start_motion)
         self.motion_btn.pack(pady=8)
-        self.stop_motion_btn = ttk.Button(self.root, text="🔴 Stop Auto Motion-Recording", command=self.stop_motion, state='disabled')
+        self.stop_motion_btn = ttk.Button(self.root, text="Stop Motion Detection & Recording", command=self.stop_motion, state='disabled')
         self.stop_motion_btn.pack(pady=2)
 
-
         # Add blue clickable motionEye link at the bottom
-        # self.motioneye_url = f"http://{self.ip}:8765"  f"localhost:8765" or 
-        self.motioneye_url = f"127.0.0.1:8765"
-        link_label = tk.Label(self.root, text=f"Open motionEye: {self.motioneye_url}", fg="blue", cursor="hand2", font=("Helvetica", 11, "underline"))
+        self.motioneye_url = "http://localhost:8765"
+        link_label = tk.Label(self.root, text=f"Open MotionEye Web UI: {self.motioneye_url}", fg="blue", cursor="hand2", font=("Helvetica", 11, "underline"))
         link_label.pack(pady=10)
         link_label.bind("<Button-1>", lambda e: self.open_motioneye())
 
@@ -246,6 +267,24 @@ class PTZCameraControl:
         except Exception as e:
             self.update_status("Movement Error", "red")
             messagebox.showerror("Error", f"Movement failed: {str(e)}")
+
+    def go_to_center(self):
+        try:
+            print("[DEBUG] Going to center preset (x=0, y=0)")
+            self.ptz.AbsoluteMove({
+                'ProfileToken': self.token,
+                'Position': {'PanTilt': {'x': 0, 'y': 0}}
+            })
+            # self.update_status("Streaming RTSP via MPV & actively controlling movement through ONVIF PTZ(Pan-Tilt-Zoom) API ", "green")
+            self.update_status(
+    "🟢 Streaming RTSP via MPV\n"
+    "🎮 Actively controlling movement through ONVIF PTZ (Pan-Tilt-Zoom) API",
+    "#13ad39"
+)
+
+        except Exception as e:
+            self.update_status("Connection Error", "red")
+            messagebox.showerror("Error", f"Connecting failed: {str(e)}")
 
     def stop(self):
         try:
@@ -307,7 +346,6 @@ class PTZCameraControl:
     def open_motioneye(self):
         # Check if motionEye is running
         try:
-            # This will work if running as root or with permissions, or use --user for user services
             out = subprocess.run(
                 ["systemctl", "is-active", "motioneye.service"],
                 capture_output=True, text=True
@@ -317,20 +355,17 @@ class PTZCameraControl:
                 started = subprocess.run(
                     ["systemctl", "start", "motioneye.service"]
                 )
-                # Give it a second to start
                 import time; time.sleep(1)
                 out = subprocess.run(
                     ["systemctl", "is-active", "motioneye.service"],
                     capture_output=True, text=True
                 )
                 if "active" not in out.stdout:
-                    # Prompt for privilege escalation
                     messagebox.showwarning(
                         "motionEye not running",
                         "motionEye could not be started automatically. Please run:\n\nsudo systemctl start motioneye.service\n\nThen click the link again."
                     )
                     return
-            # If running, open browser
             webbrowser.open(self.motioneye_url)
         except Exception as e:
             messagebox.showerror("motionEye", f"Could not check or start motionEye:\n{e}")
