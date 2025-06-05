@@ -217,10 +217,15 @@ class PTZCameraControl:
             control_frame.grid_rowconfigure(i, weight=1, minsize=btn_size)
             control_frame.grid_columnconfigure(i, weight=1, minsize=btn_size)
 
-        self.motion_btn = ttk.Button(self.root, text="Start Motion", command=self.start_motion)
+        # self.motion_btn = ttk.Button(self.root, text="Start Motion.py Movement Auto-Recording to File", command=self.start_motion)
+        # self.motion_btn.pack(pady=8)
+        # self.stop_motion_btn = ttk.Button(self.root, text="Stop Motion.py", command=self.stop_motion, state='disabled')
+        # self.stop_motion_btn.pack(pady=2)
+        self.motion_btn = ttk.Button(self.root, text="🟢 Start Auto Motion-Recording", command=self.start_motion)
         self.motion_btn.pack(pady=8)
-        self.stop_motion_btn = ttk.Button(self.root, text="Stop Motion", command=self.stop_motion, state='disabled')
+        self.stop_motion_btn = ttk.Button(self.root, text="🔴 Stop Auto Motion-Recording", command=self.stop_motion, state='disabled')
         self.stop_motion_btn.pack(pady=2)
+
 
         # Add blue clickable motionEye link at the bottom
         # self.motioneye_url = f"http://{self.ip}:8765"  f"localhost:8765" or 
