@@ -33,7 +33,7 @@ MotionEye (for web interface)
 
 (Optional for notifications) ffmpeg if your motion.conf uses video/audio processing hooks
 
-##🏴 Debian/Ubuntu Quick Install
+🏴 Debian/Ubuntu Quick Install
 ```
 sudo apt update
 sudo apt install python3 python3-pip python3-tk mpv motion ffmpeg git
@@ -42,7 +42,7 @@ pip3 install onvif-zeep
 # See https://github.com/motioneye-project/motioneye for latest install method
 ```
 
-##🅰️ Arch Linux Quick Install
+🅰️ Arch Linux Quick Install
 ```
 sudo pacman -S python-tkinter python-pip mpv motion ffmpeg git
 pip install onvif-zeep
