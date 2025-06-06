@@ -8,6 +8,7 @@ import sys
 import subprocess
 import re
 import webbrowser
+import os
 
 class PTZCameraControl:
     def __init__(self):
@@ -194,19 +195,16 @@ class PTZCameraControl:
     def setup_ui(self):
         print("[DEBUG] Setting up UI...")
 
-        # Real icon above MotionEye link
-        import os
-
-# ...inside setup_ui()...
+        # --- MotionEye blue icon at the top (decorative) ---
         try:
-            icon_path = os.path.join(os.path.dirname(__file__), "MotionEye-Blue-64x64-Icon.png")
+            icon_path = os.path.join(os.path.dirname(__file__), "icons", "MotionEye-Blue-64x64-Icon.png")
             self.icon_img = tk.PhotoImage(file=icon_path)
             icon_label = tk.Label(self.root, image=self.icon_img)
             icon_label.pack(pady=(10, 0))
         except Exception as e:
             print(f"[DEBUG] Icon could not be loaded: {e}")
 
-
+        # --- PTZ Control Buttons ---
         control_frame = ttk.Frame(self.root)
         control_frame.pack(pady=18)
         btn_size = 24
@@ -249,10 +247,39 @@ class PTZCameraControl:
         self.stop_motion_btn = ttk.Button(self.root, text="Stop Motion Detection & Recording", command=self.stop_motion, state='disabled')
         self.stop_motion_btn.pack(pady=2)
 
-        # Add blue clickable motionEye link at the bottom
+        # --- Spacer to push laptop icon & link to bottom ---
+        tk.Label(self.root).pack(expand=True)  # This spacer will grow to fill space
+
+        # --- Laptop icon as button at the bottom ---
+        try:
+            laptop_icon_path = os.path.join(
+                os.path.dirname(__file__), "icons", "Laptop-Ip-Cam-WebPage-Icon-Scaled-64x64.png"
+            )
+            self.laptop_icon_img = tk.PhotoImage(file=laptop_icon_path)
+            laptop_btn = tk.Button(
+                self.root,
+                image=self.laptop_icon_img,
+                borderwidth=0,
+                highlightthickness=0,
+                command=self.open_motioneye,
+                cursor="hand2",
+                bg="#f5f5f5",
+                activebackground="#e0e0e0"
+            )
+            laptop_btn.pack(pady=(0, 1), side="bottom")
+        except Exception as e:
+            print(f"[DEBUG] Laptop icon could not be loaded: {e}")
+
+        # --- Blue clickable MotionEye link directly under the laptop icon ---
         self.motioneye_url = "http://localhost:8765"
-        link_label = tk.Label(self.root, text=f"Open MotionEye Web UI: {self.motioneye_url}", fg="blue", cursor="hand2", font=("Helvetica", 11, "underline"))
-        link_label.pack(pady=10)
+        link_label = tk.Label(
+            self.root,
+            text=f"Open MotionEye Web UI: {self.motioneye_url}",
+            fg="blue",
+            cursor="hand2",
+            font=("Helvetica", 11, "underline")
+        )
+        link_label.pack(pady=(0, 8), side="bottom")
         link_label.bind("<Button-1>", lambda e: self.open_motioneye())
 
         print("[DEBUG] UI setup complete.")
@@ -275,13 +302,12 @@ class PTZCameraControl:
                 'ProfileToken': self.token,
                 'Position': {'PanTilt': {'x': 0, 'y': 0}}
             })
-            # self.update_status("Streaming RTSP via MPV & actively controlling movement through ONVIF PTZ(Pan-Tilt-Zoom) API ", "green")
             self.update_status(
-    "🟢 Streaming RTSP via MPV\n"
-    "🎮 Actively controlling movement through ONVIF PTZ (Pan-Tilt-Zoom) API",
-    "#13ad39"
-)
-
+                "🟢 Streaming RTSP via MPV\n"
+                "🎮 Actively controlling movement through:\n" "" \
+                "ONVIF PTZ (Pan-Tilt-Zoom) API\n",
+                "#13ad39"
+            )
         except Exception as e:
             self.update_status("Connection Error", "red")
             messagebox.showerror("Error", f"Connecting failed: {str(e)}")
