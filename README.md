@@ -1,3 +1,7 @@
+![Main Screen](./NewGUI-Main-Screen.png)
+
+
+
 # NVR_PTZ_ONVIR_All_In_One_Cam_Commander
 
 **NVR_PTZ_ONVIR_All_In_One_Cam_Commander** is a powerful all-in-one video suite for ONVIF-compatible IP cameras, delivering instant PTZ control, motion-triggered recording, and integrated MotionEye web server access—no NVR hardware required.
@@ -70,9 +74,8 @@ or with your alias:
 ```
 ccgui 192.168.1.xx
 ```
-Click the MotionEye link in the GUI to open the web UI.
 
-Enjoy your new open-source camera command center! 😎
+Click the link or PC Icon at the bottom to open the MotionEye web UI.
 
+Enjoy your new open-source IP-Camera command and control center! 😎
 
-Example screenshots and more usage tips will be added soon!
